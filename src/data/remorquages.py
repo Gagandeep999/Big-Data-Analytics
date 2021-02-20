@@ -1,0 +1,22 @@
+class Remouquages:
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        pass
+
+
+
+# ['DATE_ORIGINE',
+#  'LONGITUDE_ORIGINE',
+#  'LATITUDE_ORIGINE',
+#  'RUE_ORIGINE',
+#  'SECTEUR_ORIGINE',
+#  'ARRONDISSEMENT_ORIGINE',
+#  'DATE_DESTINATION',
+#  'LONGITUDE_DESTINATION',
+#  'LATITUDE_DESTINATION',
+#  'RUE_DESTINATION',
+#  'SECTEUR_DESTINATION',
+#  'ARRONDISSEMENT_DESTINATION',
+#  'MOTIF_REMORQUAGE']
