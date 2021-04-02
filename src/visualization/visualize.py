@@ -36,20 +36,9 @@ def generate_visuals(df_remor, boroughs):
         towing_per_year_visual(str(year), towings, boroughs)
 
 
-
-# # a method that reads all necessary files and returns back the files
-# def load_data():
-#     df_remor = pd.read_csv(os.path.join(DATA_RAW_DIR, 'remorquages.csv'), header=0)
-#     towings = gpd.GeoDataFrame(df_remor, geometry=gpd.points_from_xy(df_remor.LONGITUDE_ORIGINE, df_remor.LATITUDE_ORIGINE))
-#     boroughs = gpd.read_file(os.path.join(DATA_RAW_DIR, 'montreal_boroughs.json'))
-#     return towings, boroughs
-
-# end goal is to give a command to the user such that when they run the code they can generate 
-# all the files again
-
 if __name__=='__main__':
     logging.info('Running scripts to generate visualizations...')
     df_remorquages = pd.read_csv(os.path.join(DATA_RAW_DIR, 'remorquages.csv'), header=0)
     df_remorquages['DATE_ORIGINE'] = pd.to_datetime(df_remorquages['DATE_ORIGINE'])
-    boroughs = gpd.read_file(os.path.join(DATA_RAW_DIR, 'montreal_boroughs.json'))
+    boroughs = gpd.read_file(os.path.join(DATA_RAW_DIR, 'montreal_boroughs.geojson'))
     generate_visuals(df_remorquages, boroughs)
