@@ -49,48 +49,6 @@ def load_data(spark, filename):
     return data
 
 
-def distance_bw_parking_spots(data):
-    if not isinstance(data, DataFrame):
-        raise ValueError('Type pass to distance_bw_parking_spots() should be DataFrame.')
-    data = data.\
-        withColumn('LONGITUDE_ORIGINE_rad', F.expr('radians(LONGITUDE_ORIGINE)')).\
-        withColumn('LATITUDE_ORIGINE_rad', F.expr('radians(LATITUDE_ORIGINE)')).\
-        withColumn('LONGITUDE_DESTINATION_rad', F.expr('radians(LONGITUDE_DESTINATION)')).\
-        withColumn('LATITUDE_DESTINATION_rad', F.expr('radians(LATITUDE_DESTINATION)')).\
-        withColumn('Diff_long', F.expr('(LONGITUDE_DESTINATION_rad-LONGITUDE_ORIGINE_rad)/2')).\
-        withColumn('Diff_lat', F.expr('(LONGITUDE_DESTINATION_rad-LONGITUDE_ORIGINE_rad)/2')).\
-        withColumn('LATITUDE_DESTINATION_cos', F.expr('cos(LATITUDE_DESTINATION_rad)')).\
-        withColumn('LATITUDE_ORIGINE_cos', F.expr('cos(LATITUDE_ORIGINE_rad)')).\
-        withColumn('Diff_long', F.expr('sin(Diff_long)')).\
-        withColumn('Diff_lat', F.expr('sin(Diff_lat)')).\
-        withColumn('A', F.expr('Diff_lat*Diff_lat + LATITUDE_DESTINATION_cos * LATITUDE_ORIGINE_cos * Diff_long * Diff_long')).\
-        withColumn('One_minus_A', F.expr('1-A')).\
-        withColumn('C', F.expr('2 * atan2( sqrt(A), sqrt(One_minus_A))')).\
-        withColumn('Distance_km', F.expr('6373.0*C'))
-
-    # cols_needed = ['DATE_ORIGINE', 'LONGITUDE_ORIGINE', 'LATITUDE_ORIGINE', 'Distance(Km)', 'MOTIF_REMORQUAGE']
-    
-    df_final = data.select('DATE_ORIGINE', 'LONGITUDE_ORIGINE', 'LATITUDE_ORIGINE', 'Distance_km', 'MOTIF_REMORQUAGE')
-    try:
-        assert df_final.count()==250077
-    except AssertionError:
-        logging.error('Final count does not match before removing NA. Saving to file anyways...')
-
-    df_final = df_final.na.drop()
-
-    try:
-        assert df_final.count()==248476
-    except AssertionError:
-        logging.error('Final count does not match after removing NA. Saving to file anyways...')
-    
-    return df_final
-
-
-def combine_towing_and_weather(towing_data, weather_data):
-    logging.info('Joinging the towing and weather data to make final dataset ...')
-    pass
-
-
 def make_towing_data(spark, filename):
     logging.info('Making towing data ...')
     data = load_data(spark, filename)
@@ -142,18 +100,16 @@ def format_weather_data(data):
     return data_weather
 
 
-def save_towing_data(data):
+def save_data(data, filename):
     if not isinstance(data, DataFrame):
         raise ValueError('Cannot save towing data. It is not a PySpark DataFrame object')
-    logging.info('Saving towing data as parquet file to ../interim directory')
-    data.write.mode('overwrite').parquet(os.path.join(DATA_INTERIM_DIR, 'towing.data'))
+    logging.info('Saving data as parquet file to ../interim directory')
+    data.write.mode('overwrite').parquet(os.path.join(DATA_INTERIM_DIR, filename))
 
 
-def save_weather_data(data):
-    if not isinstance(data, DataFrame):
-        raise ValueError('Cannot save towing data. It is not a PySpark DataFrame object')
-    logging.info('Saving weather data as parquet file to ../interim directory')
-    data.write.mode('overwrite').parquet(os.path.join(DATA_INTERIM_DIR, 'weather.data'))
+def load_data_parquet(spark, filename):
+    data = spark.read.parquet(filename)
+    return data
 
 
 if __name__ == '__main__':
@@ -167,12 +123,5 @@ if __name__ == '__main__':
     towing_data = format_towing_data(towing_data)
     weather_data = make_weather_data(spark, weather_file)
     weather_data = format_weather_data(weather_data)
-    save_weather_data(weather_data)
-    towing_with_distance = distance_bw_parking_spots(towing_data)
-    save_towing_data(towing_with_distance)
-    combine_towing_and_weather(towing_data, weather_data)
-
-
-    # spark_session, data = load_data(filename)
-    # spark_session, data = distance_bw_parking_spots(spark_session, data)
-    # combine_with_weather(spark_session, data)
+    save_data(towing_data, 'towing.data')
+    save_data(weather_data, 'weather.data')
