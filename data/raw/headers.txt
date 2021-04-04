@@ -1,0 +1,26 @@
+==> BornesHorsRue.csv <==
+nNoBorne,sTerrain,sNomRuePrincipale,sStatut,nLongitude,nLatitude,Lun,Mar,Mer,Jeu,Ven,Sam,Dim,dtHeureDebutAP,dtHeureFinAP,nTarifHoraire,nMax
+
+==> BornesSurRue.csv <==
+nNoBorne,sStatut,sNomRue,sZoneGroupeCode,nLongitude,nLatitude,sTypeExploitation
+
+==> EmplacementReglementation.csv <==
+sNoEmplacement,sCodeAutocollant
+
+==> Periodes.csv <==
+nID,dtHeureDebut,dtHeureFin,bLun,bMar,bMer,bJeu,bVen,bSam,bDim
+
+==> Places.csv <==
+sNoPlace,nLongitude,nLatitude,nPositionCentreLongitude,nPositionCentreLatitude,sStatut,sGenre,sType,sAutreTete,sNomRue,nSupVelo,sTypeExploitation,nTarifHoraire,sLocalisation,nTarifMax
+
+==> ReglementationPeriode.csv <==
+sCode,noPeriode,sDescription
+
+==> Reglementations.csv <==
+Name,Type,DateDebut,DateFin,maxHeures
+
+==> remorquages.csv <==
+DATE_ORIGINE,LONGITUDE_ORIGINE,LATITUDE_ORIGINE,RUE_ORIGINE,SECTEUR_ORIGINE,ARRONDISSEMENT_ORIGINE,DATE_DESTINATION,LONGITUDE_DESTINATION,LATITUDE_DESTINATION,RUE_DESTINATION,SECTEUR_DESTINATION,ARRONDISSEMENT_DESTINATION,MOTIF_REMORQUAGE
+
+==> remorquages2005-2015.csv <==
+DATE_ORIGINE,RUE_ORIGINE,ARRONDISSEMENT_ORIGINE,RUE_DESTINATION,MOTIF_REMORQUAGE
