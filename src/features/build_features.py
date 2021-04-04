@@ -64,22 +64,60 @@ def get_necessary_columns_from_weather_data(data):
     return df_final
 
 
-def combine_towing_and_weaher_data():
-    pass
+def combine_towing_and_weather_data(towing_data, weather_data):
+    combined_data = towing_data.join(weather_data, towing_data.DATE_ORIGINE==weather_data.Date_Time)
+    return combined_data
+    
+
+def clean_and_combined_data(combined_list):
+    """ list of combined dataframes as input and remove None values from individual dataframes """
+    df_final = combined_list[0].unionByName(combined_list[1])
+    for i in range(2, len(combined_list)):
+        df_final = df_final.unionByName(combined_list[i])
+    null_cols = []
+    for col_name in df_final.schema.names:
+        if df_final.filter(df_final[col_name].isNull()).count() > 0:
+            null_cols.append(col_name)
+        
+    for null_col_name in null_cols:
+        df_final = df_final.fillna({null_col_name:'0'})
+
+    new_df_cleaned = convert_str_to_double(df_final)
+
+    return new_df_cleaned
+
+
+def convert_str_to_double(data):
+    new_df = data.withColumn('LONGITUDE_ORIGINE', data.LONGITUDE_ORIGINE.cast('double')).\
+                    withColumn('LATITUDE_ORIGINE', data.LATITUDE_ORIGINE.cast('double')).\
+                    withColumn('Year', data.Year.cast('double')).\
+                    withColumn('Month', data.Month.cast('double')).\
+                    withColumn('Day', data.Day.cast('double')).\
+                    withColumn('Mean_Temp', data.Mean_Temp.cast('double')).\
+                    withColumn('Total_Rain', data.Total_Rain.cast('double')).\
+                    withColumn('Total_Precip', data.Total_Precip.cast('double')).\
+                    withColumn('Total_Snow', data.Total_Snow.cast('double')).\
+                    withColumn('Spd_of_Max_Gust', data.Spd_of_Max_Gust.cast('double'))
+    return new_df
 
 
 if __name__ == '__main__':
-    towing_file = os.path.join(DATA_INTERIM_DIR, 'towing.data')
-    weather_file = os.path.join(DATA_INTERIM_DIR, 'weather.data')
     spark = make_dataset.init_spark()
-    towing_data = make_dataset.load_data_parquet(spark, towing_file)
-    weather_data = make_dataset.load_data_parquet(spark, weather_file)
-    towing_distance = distance_bw_parking_spots(towing_data)
-    weather_features_needed = get_necessary_columns_from_weather_data(weather_data)
 
-    towing_file = os.path.join(DATA_INTERIM_DIR, 'towing_needed.data')
-    weather_file = os.path.join(DATA_INTERIM_DIR, 'weather_needed.data')
-    make_dataset.save_data(towing_distance, towing_file)
-    make_dataset.save_data(weather_features_needed, weather_file)
+    towing_file = os.path.join(DATA_INTERIM_DIR, 'towing.data')
+    towing_data = make_dataset.load_data_parquet(spark, towing_file)
+    towing_distance = distance_bw_parking_spots(towing_data)
+
+    joined_list = []
+    for year in range(2015, 2021, 1):
+        weather_file = os.path.join(DATA_INTERIM_DIR, 'weather_{0}.data'.format(str(year)))
+        weather_data = make_dataset.load_data_parquet(spark, weather_file)
+        weather_features_needed = get_necessary_columns_from_weather_data(weather_data)
+
+        joined_data = combine_towing_and_weather_data(towing_distance, weather_features_needed)
+        joined_list.append(joined_data)
+
+    cleaned_data = clean_and_combined_data(joined_list)
+    make_dataset.save_data(cleaned_data, os.path.join(DATA_PROCESSED_DIR, 'cleaned.data'))
 
     

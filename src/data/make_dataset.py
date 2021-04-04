@@ -103,7 +103,7 @@ def format_weather_data(data):
 def save_data(data, filename):
     if not isinstance(data, DataFrame):
         raise ValueError('Cannot save towing data. It is not a PySpark DataFrame object')
-    logging.info('Saving data as parquet file to ../interim directory')
+    logging.info('Saving data as parquet file ...')
     data.write.mode('overwrite').parquet(os.path.join(DATA_INTERIM_DIR, filename))
 
 
@@ -113,15 +113,16 @@ def load_data_parquet(spark, filename):
 
 
 if __name__ == '__main__':
-    towing_file = os.path.join(DATA_RAW_DIR, 'remorquages.csv')
-    weather_file = os.path.join(DATA_RAW_DIR, 'en_climate_daily_QC_702S006_2015_P1D.csv')
-
     logging.info('Initiating Spark...')
     spark = init_spark()
 
+    towing_file = os.path.join(DATA_RAW_DIR, 'remorquages.csv')
     towing_data = make_towing_data(spark, towing_file)
     towing_data = format_towing_data(towing_data)
-    weather_data = make_weather_data(spark, weather_file)
-    weather_data = format_weather_data(weather_data)
     save_data(towing_data, 'towing.data')
-    save_data(weather_data, 'weather.data')
+
+    for year in range(2015, 2021, 1):
+        weather_file = os.path.join(DATA_RAW_DIR, 'en_climate_daily_QC_702S006_{0}_P1D.csv'.format(str(year)))
+        weather_data = make_weather_data(spark, weather_file)
+        weather_data = format_weather_data(weather_data)
+        save_data(weather_data, 'weather_{0}.data'.format(str(year)))
