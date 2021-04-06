@@ -36,13 +36,13 @@ Add more details here<br>
 Add more details here<br>
 <b>Discussion of limitations</b><br>
 Add more details here<br>
-<b>Discussion of possible future work</b>
+<b>Discussion of possible future work</b><br>
 Add more details here<br>
 <br>
-
-Implementation
-------------
-### Prerequisties<br>
+___
+<br>
+<b>IMPLEMENTATION</b><br>
+<b>Prerequisties</b><br>
 Make sure you have anaconda installed on your system. Open anaconda prompt and run the following commands -
 
 To setup the environment<br>
@@ -54,19 +54,23 @@ Activate your environment<br>
 Naviagte to the project directory and run the command to installed the necessary libraries<br>
 ```$ pip install -r requirements.txt```
 <br><br>
-### Methodology<br>Preprocesing scripts are located in the src/data directory. Navigate to the /src/data/ folder and 
-run the following command. Once it is complete, you have parquet files in the /data/interim/ directory.<br>
-```$ python make_dataset.py ```
-After the preprocessing, to build feature you can run the following command. Once the execution finishes,
-you can find the cleaned.data parquet file in /data/processed/ directory which is used for training the model.<br>
-```$ python build_features.py ```
-Finally to train the model the following commad from /src/models/ directory. This will also save the trained model 
+
+<b>Methodology</b><br>
+Preprocesing scripts are located in the src/data directory. Navigate to the ```/src/data/``` folder and run the following command. Once it is complete, you have parquet files in the /data/interim/ directory.<br>
+```$ python make_dataset.py ``` <br>
+
+After the preprocessing, to build feature you can run the following command from the ```/src/features/``` directory. Once the execution finishes,
+you can find the cleaned.data parquet file which is used for training the model, in /data/processed/ directory.<br>
+```$ python build_features.py ``` <br>
+
+Finally, to train the model the following commad from ```/src/models/``` directory. This will also save the trained model 
 in the /models/\<today's-date>/ directory<br>
 ```$ python train_model.py ```
 <br><br>
+___
+<br>
+<b>PROJECT ORGANIZATION</b>
 
-Project Organization
-------------
 
     ├── LICENSE
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
