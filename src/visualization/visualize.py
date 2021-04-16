@@ -22,23 +22,38 @@ RPT_FIGURES_DIR = os.path.join(RPT_DIR, 'figures')
 def towing_per_year_visual(year, towings, boroughs):
     logging.info('Visualizations for the year {0}...'.format(year))
     output_filename = year+'_towings.png'
-    fig, ax = plt.subplots(1, figsize=(15, 15))
+    fig, ax = plt.subplots(1, figsize=(8, 4))
     boroughs.plot(ax=ax)
-    towings.plot(ax=ax, marker='o', color='r', alpha=0.3)
+    towings.plot(ax=ax, marker='o', color='r', alpha=0.075)
+    plt.title('Towing in the year {0}'.format(year))
     plt.savefig(os.path.join(RPT_FIGURES_DIR, output_filename))
 
 
-def generate_visuals(df_remor, boroughs):
+def parking_spots(spots, boroughs):
+    logging.info('Visualizations for parking spots...')
+    output_filename = 'Parking_spots.png'
+    fig, ax = plt.subplots(1, figsize=(8, 4))
+    boroughs.plot(ax=ax)
+    spots.plot(ax=ax, marker='o', cmap = "hsv", alpha=0.075)
+    plt.title('Parking Spots of Montreal')
+    plt.savefig(os.path.join(RPT_FIGURES_DIR, output_filename))
+
+
+def generate_visuals(df_remor, df_spots, boroughs):
     logging.info('Generating visualizations per year...')
     for year in range(2015, 2021, 1):
         df_remor_per_year = df_remor[df_remor['DATE_ORIGINE'].dt.strftime('%Y') == str(year)]
         towings = gpd.GeoDataFrame(df_remor_per_year, geometry=gpd.points_from_xy(df_remor_per_year.LONGITUDE_ORIGINE, df_remor_per_year.LATITUDE_ORIGINE))
         towing_per_year_visual(str(year), towings, boroughs)
+    logging.info('Generating visualizations for parking spots...')
+    spots = gpd.GeoDataFrame(df_spots, geometry=gpd.points_from_xy(df_spots.nPositionCentreLongitude, df_spots.nPositionCentreLatitude))
+    parking_spots(spots, boroughs)
 
 
 if __name__=='__main__':
     logging.info('Running scripts to generate visualizations...')
     df_remorquages = pd.read_csv(os.path.join(DATA_RAW_DIR, 'remorquages.csv'), header=0)
+    df_spots = pd.read_csv(os.path.join(DATA_RAW_DIR, 'Places.csv'), header=0, encoding='cp1252')
     df_remorquages['DATE_ORIGINE'] = pd.to_datetime(df_remorquages['DATE_ORIGINE'])
     boroughs = gpd.read_file(os.path.join(DATA_RAW_DIR, 'montreal_boroughs.geojson'))
-    generate_visuals(df_remorquages, boroughs)
+    generate_visuals(df_remorquages, df_spots, boroughs)

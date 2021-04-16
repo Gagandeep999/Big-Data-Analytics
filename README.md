@@ -33,7 +33,24 @@ Using dask we read the Places.csv file that contained details related to all the
 
 <b>RESULTS</b><br>
 <b>Description of Dataset analysis</b><br>
-Add more details here <br>
+The analysis of the towing data showed us that there was a drastic increase in the number of towing after the from 2015 onwards as can be seen in the following figures - 
+![2015](reports/figures/2015_towings.png)
+![2016](reports/figures/2016_towings.png)
+![2017](reports/figures/2017_towings.png)
+![2018](reports/figures/2018_towings.png)
+![2019](reports/figures/2018_towings.png)
+![2020](reports/figures/2020_towings.png)<br>
+
+The above images show that the data is not very well distributed. It is highly concentrated around the downtown region of Montreal and zero data points in the West part of Montreal. As a result of this fact the learning of our model was also impacted. <br>
+
+Below is the graph that shows the parking spots of Montreal that are controlled by the City of Montreal.
+
+![Parking](reports/figures/Parking_spots.png)
+
+These are the results we obtained after applying our self-implemented dask k-means to the same dataset.
+
+![Parking](reports/figures/Parking_spots_dask.png)
+
 <b>Description of Implementation</b><br>
 Add more details here<br>
 
@@ -63,7 +80,7 @@ Naviagte to the project directory and run the command to installed the necessary
 
 <b>Methodology</b><br>
 Preprocesing scripts are located in the src/data directory. Navigate to the ```/src/data/``` folder and run the following command. Once it is complete, you have parquet files in the /data/interim/ directory.<br>
-```$ python make_dataset.py ``` <br>
+```$ python make_dataset.py``` <br>
 
 After the preprocessing, to build feature you can run the following command from the ```/src/features/``` directory. Once the execution finishes,
 you can find the cleaned.data parquet file which is used for training the model, in /data/processed/ directory.<br>
@@ -82,10 +99,10 @@ ___
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
     ├── README.md          <- The top-level README for developers using this project.
     ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable dataI dump.
+    │   ├── external       <- Data from third party sources.
+    │   ├── interim        <- Intermediate data that has been transformed.
+    │   ├── processed      <- The final, canonical data sets for modeling.
+    │   └── raw            <- The original, immutable dataI dump.
     │
     ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
     │
@@ -98,28 +115,28 @@ ___
     ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
     │
     ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
+    │   └── figures        <- Generated graphics and figures to be used in reporting
     │
     ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
     │                         generated with `pip freeze > requirements.txt`
     │
     ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
     ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
+    │   ├── __init__.py    <- Makes src a Python module
     │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
+    │   ├── data           <- Scripts to download or generate data
+    │   │   └── make_dataset.py
     │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
+    │   ├── features       <- Scripts to turn raw data into features for modeling
+    │   │   └── build_features.py
     │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
+    │   ├── models         <- Scripts to train models and then use trained models to make
     │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
+    │   │   ├── predict_model.py
+    │   │   └── train_model.py
     │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
+    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
+    │       └── visualize.py
     │
     └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
 
