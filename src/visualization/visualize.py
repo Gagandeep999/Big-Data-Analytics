@@ -22,9 +22,10 @@ RPT_FIGURES_DIR = os.path.join(RPT_DIR, 'figures')
 def towing_per_year_visual(year, towings, boroughs):
     logging.info('Visualizations for the year {0}...'.format(year))
     output_filename = year+'_towings.png'
-    fig, ax = plt.subplots(1, figsize=(15, 15))
+    fig, ax = plt.subplots(1, figsize=(8, 4))
     boroughs.plot(ax=ax)
-    towings.plot(ax=ax, marker='o', color='r', alpha=0.3)
+    towings.plot(ax=ax, marker='o', color='r', alpha=0.075)
+    plt.title('Towing in the year {0}'.format(year))
     plt.savefig(os.path.join(RPT_FIGURES_DIR, output_filename))
 
 

@@ -33,7 +33,15 @@ Using dask we read the Places.csv file that contained details related to all the
 
 <b>RESULTS</b><br>
 <b>Description of Dataset analysis</b><br>
-Add more details here <br>
+The analysis of the towing data showed us that there was a drastic increase in the number of towing after the from 2015 onwards as can be seen in the following figures - 
+![2015](reports/figures/2015_towings.png)
+![2016](reports/figures/2016_towings.png)
+![2017](reports/figures/2017_towings.png)
+![2018](reports/figures/2018_towings.png)
+![2019](reports/figures/2018_towings.png)
+![2020](reports/figures/2020_towings.png)<br>
+
+The above images show that the data is not very well distributed. It is highly concentrated around the downtown region of Montreal and zero data points in the West part of Montreal. As a result of this fact the learning of our model was also impacted. <br>
 <b>Description of Implementation</b><br>
 Add more details here<br>
 
@@ -63,7 +71,7 @@ Naviagte to the project directory and run the command to installed the necessary
 
 <b>Methodology</b><br>
 Preprocesing scripts are located in the src/data directory. Navigate to the ```/src/data/``` folder and run the following command. Once it is complete, you have parquet files in the /data/interim/ directory.<br>
-```$ python make_dataset.py ``` <br>
+```$ python make_dataset.py``` <br>
 
 After the preprocessing, to build feature you can run the following command from the ```/src/features/``` directory. Once the execution finishes,
 you can find the cleaned.data parquet file which is used for training the model, in /data/processed/ directory.<br>
