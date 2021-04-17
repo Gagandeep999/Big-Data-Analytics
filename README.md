@@ -177,33 +177,13 @@ ___
     └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
 
 
---------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
 
 
-===========
+---
+
 
 [1] = https://en.wikipedia.org/wiki/Montreal
 
-[2] = https://www.wardsauto.com/news-analysis/how-long-you-wait-roadside-service-depends-what-youre-calling
-
 [Hav] = https://stackoverflow.com/questions/19412462/getting-distance-between-two-points-based-on-latitude-longitude
-
-Extra content that can be used somewhere else
-
-Using the acquired data we plan to train a linear regression model that learn how far the cars were placed in the past and predict the same for new unseen data.
-
-From the mellow sounds of International Jazz Festival to the deafening formula race cars at the Grand Prix Monteal, from the florid orange sunrise at Mount Royal and to the spectacular sunset at Oratorie Saint-Joseph Montreal attracts tourists from all over the world all year round.
-
-Imagine being a tourist and you have a schedule to visit top10 tourist locations of the city you are visiting, but all of a sudden you realize that your car is towed and which is not only going to cost extra on the budget for the trip but also time. You might have to skip a destination or two becuase of this inconvience.
-
-A study found that cellular phone callers wait nearly as long, an average of 46mins before the help arrives[2].
-
-Using the matplotlib we would next plot the towing of different years on a map of montreal and expect to see some trend realted to the towings.
-
-such that our features include geocordinate, timestamp and weather condition at the time of towing
- 
-rue_origine, secteur_origine, arrondissement_origine, date_destination, rue_destination, secteur_destination, arrondissement_destination, 
-
-Station Name, Climate ID, Data Quality, Max Temp (°C), Max Temp Flag, Min Temp (°C), Min Temp Flag, Mean Temp Flag, Heat Deg Days (°C), Heat Deg Days Flag, Cool Deg Days (°C), Cool Deg Days Flag, Total Rain Flag,  Total Snow Flag, Total Precip Flag,
