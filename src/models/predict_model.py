@@ -17,6 +17,7 @@ from dask.distributed import Client
 import matplotlib.pyplot as plt
 from functools import reduce
 import geopandas as gpd
+from sklearn.metrics
 
 from dask.distributed import Client
 
@@ -79,3 +80,7 @@ if __name__ == '__main__':
     clustered_data_geo = gpd.GeoDataFrame(clustered_data, geometry=gpd.points_from_xy(clustered_data.nPositionCentreLongitude, clustered_data.nPositionCentreLatitude))
     boroughs = gpd.read_file(os.path.join(DATA_RAW_DIR, 'montreal_boroughs.geojson'))
     visualize.plot_parking_spots(clustered_data_geo, boroughs, 'Clustered parking spots after running k-means', 'Parking_spots_dask.png')
+    y_true = clustered_data_geo['Cities']
+    y_pred = clustered_data_geo['new_centroids']
+    cm = confusion_matrix(y_true, y_pred, labels=spots_cities)
+    logging.info(classification_report(y_true, y_pred, target_names=spots_cities, zero_division=0))

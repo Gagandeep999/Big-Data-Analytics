@@ -102,7 +102,7 @@ def make_weather_data(spark, filename):
 
 
 def make_spots_data(spots):
-    logging.info('Making parking_spots data ...')
+    logging.info('Making parking_spots data (takes more because of pandas implementation) ...')
     df_spots = pd.read_csv(spots, header=0, encoding='cp1252')
     df_spots = gpd.GeoDataFrame(df_spots, geometry=gpd.points_from_xy(df_spots.nPositionCentreLongitude, df_spots.nPositionCentreLatitude))
     df_spots['Cities'] = df_spots['geometry'].map(get_city)
@@ -156,6 +156,7 @@ def save_data(data, filename):
 
 
 def save_spots_data(data, filename):
+    data = data.replace(['Côte-des-Neiges-Notre-Dame-de-Grâce'], ['Cote-des-Neiges-Notre-Dame-de-Grace'])
     data.to_csv(path_or_buf=filename, columns=['sNoPlace', 'nPositionCentreLongitude', 'nPositionCentreLatitude', 'geometry', 'Cities'], header=True)
 
 
