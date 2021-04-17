@@ -12,7 +12,6 @@ cycler==0.10.0
 cytoolz==0.11.0
 descartes==1.1.0
 entrypoints==0.3
-Fiona==1.8.18
 geopandas==0.8.2
 HeapDict==1.0.1
 ipykernel==5.4.3
@@ -27,9 +26,6 @@ locket==0.2.0
 MarkupSafe==1.1.1
 mccabe==0.6.1
 mistune==0.8.4
-mkl-fft==1.2.0
-mkl-random==1.1.1
-mkl-service==2.3.0
 munch==2.5.0
 olefile==0.46
 partd==1.1.0
@@ -38,7 +34,7 @@ poyo==0.5.0
 py4j==0.10.9
 pylint==2.6.0
 pyspark==3.1.1
-pytest==0.0.0
+pytest
 python-dateutil==2.8.1
 python-slugify==4.0.1
 PyYAML==5.3.1
