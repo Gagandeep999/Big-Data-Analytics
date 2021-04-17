@@ -43,7 +43,7 @@ The analysis of the towing data showed us that there was a drastic increase in t
 
 The above images show that the data is not very well distributed. It is highly concentrated around the downtown region of Montreal and zero data points in the West part of Montreal. As a result of this fact the learning of our model was also impacted. <br>
 
-Below is the graph that shows the parking spots of Montreal that are controlled by the City of Montreal.
+Below is the graph that shows the parking spots of Montreal that are controlled by the City of Montreal. One issue we faced was that many close parking spots hindered the visualization of the spots. 
 
 ![Parking](reports/figures/Parking_spots.png)
 

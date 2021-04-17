@@ -1,9 +1,15 @@
 import os
+import json
 import logging
+import pandas as pd
+import geopandas as gpd
 from pyspark.rdd import RDD
 from pyspark.sql import DataFrame
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
+from shapely.ops import nearest_points
+from shapely.geometry import Point, mapping, shape
+
 
 log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(level=logging.INFO, format=log_fmt)
@@ -12,6 +18,10 @@ PROJ_DIR = os.getcwd().split(os.sep)[:-2]
 DATA_DIR = os.path.join(os.sep.join(PROJ_DIR), 'data')
 DATA_RAW_DIR = os.path.join(DATA_DIR, 'raw')
 DATA_INTERIM_DIR = os.path.join(DATA_DIR, 'interim')
+
+
+with open(os.path.join(DATA_RAW_DIR, 'montreal_boroughs.geojson')) as f:
+    geojson = json.load(f)
 
 
 def init_spark():
@@ -43,6 +53,36 @@ def toCSVLine(data):
     return None
 
 
+def get_city(ref_point):
+    min_distance = None
+    features = []
+    for i, feature in enumerate(geojson["features"]):
+        p1, p2 = nearest_points(shape(feature["geometry"]), ref_point)
+        distance = p1.distance(p2)
+        prop_org = feature["properties"]
+        if min_distance is None or distance < min_distance:
+            min_distance = distance
+        feature["prop"] = {"distance": distance, "properties":prop_org}
+        features.append(feature)
+        features.append(
+            {
+                "type": "Feature",
+                "prop": {"distance": distance, "properties":prop_org},
+                "geometry": mapping(p1),
+            }
+        )
+
+    features = sorted(features, key=lambda x: x["prop"]["distance"])
+    features.append(
+        {
+            "type": "Feature",
+            "prop": {"distance": 0, "properties":prop_org},
+            "geometry": mapping(ref_point),
+        }
+    )
+    return features[0]['properties']['NOM']
+
+
 def load_data(spark, filename):
     logging.info('Loading data...')
     data = spark.read.csv(filename, header=True)
@@ -59,6 +99,14 @@ def make_weather_data(spark, filename):
     logging.info('Making weather data ...')
     data = load_data(spark, filename)
     return data
+
+
+def make_spots_data(spots):
+    logging.info('Making parking_spots data ...')
+    df_spots = pd.read_csv(spots, header=0, encoding='cp1252')
+    df_spots = gpd.GeoDataFrame(df_spots, geometry=gpd.points_from_xy(df_spots.nPositionCentreLongitude, df_spots.nPositionCentreLatitude))
+    df_spots['Cities'] = df_spots['geometry'].map(get_city)
+    return df_spots
 
 
 def format_towing_data(data):
@@ -107,6 +155,10 @@ def save_data(data, filename):
     data.write.mode('overwrite').parquet(os.path.join(DATA_INTERIM_DIR, filename))
 
 
+def save_spots_data(data, filename):
+    data.to_csv(path_or_buf=filename, columns=['sNoPlace', 'nPositionCentreLongitude', 'nPositionCentreLatitude', 'geometry', 'Cities'], header=True)
+
+
 def load_data_parquet(spark, filename):
     data = spark.read.parquet(filename)
     return data
@@ -126,3 +178,7 @@ if __name__ == '__main__':
         weather_data = make_weather_data(spark, weather_file)
         weather_data = format_weather_data(weather_data)
         save_data(weather_data, 'weather_{0}.data'.format(str(year)))
+    
+    spots_file = os.path.join(DATA_RAW_DIR, 'Places.csv')
+    spots_data = make_spots_data(spots_file)
+    save_spots_data(spots_data, os.path.join(DATA_INTERIM_DIR, 'spots_with_cities.csv'))
