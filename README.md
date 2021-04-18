@@ -17,29 +17,27 @@ We plan to first of all clean, preprocess, and sanitize our data. Next, we plan 
 
 <b>MATERIALS AND METHODS</b><br>
 <b>Datasets</b><br>
-The towing dataset was obtained from the Govt of Canada open data portal website. It contains information from the year 2015-2020 with almost ~250,000 rows of data. We used the following features from the dataset - date_origine, longitude_origine, latitude_origine, longitude_destination, latitude_destination, motif_remorquage. After the clean-up we were left with almost ~200,000 data points for training. 
-
-Our second dataset that was used for the supervised learning task was the weather data. This was also from the Govt of Canada website but it's available in a yearly format. So, we have 6 files for each years ranging from 2015-2020 with 366 rows for each year with the exception of 2016 and 2020 which are leap years. It contains observations made at the Montreal/Pierre Elliott Trudeau Intl weather station. The list of features used are - Longitude (x), Latitude (y), Date/Time, Month, Day, Mean Temp (°C), Total Rain (mm), Total Snow (cm), Total Precip (mm).
-
-We decided to use the data from the City of Montreal for the k-means clustering. It contains the details about all the parking spots on the island of Montreal. This data has 18635 rows one for each of the parking spot in Montreal and the data related to each spot was already been divided into multiple files as a relational database model. Some of the key features used - Snoplace, Nlongitude, Nlatitude.
+The towing dataset was obtained from the Govt of Canada open data portal website. It contains information from the year 2015-2020 with almost ~250,000 rows of data. We used the following features from the dataset - date_origine, longitude_origine, latitude_origine, longitude_destination, latitude_destination, motif_remorquage. After the clean-up we were left with almost ~200,000 data points for training.<br/>
+Our second dataset that was used for the supervised learning task was the weather data. This was also from the Govt of Canada website but it's available in a yearly format. So, we took 6 files for each year ranging from 2015-2020 with 366 rows for each year. The list of features used are - Longitude (x), Latitude (y), Date/Time, Month, Day, Mean Temp (°C), Total Rain (mm), Total Snow (cm), Total Precip (mm).<br/>
+We decided to use the data from the City of Montreal for the k-means clustering. It contains the details about all the parking spots on the island of Montreal. This data has 18635 rows one for each of the parking spot in Montreal. Some of the key features used - Snoplace, Nlongitude, Nlatitude.<br>
 
 <b>Technologies</b><br>
-We wanted to leverage the methods learned in class to speed up our data cleaning and preprocessing. The first task was to load data into a pyspark dataframe. From there on we went to perform all kinds of operations and benefit from the speed up of parallel processing. The most tricky part was to find the distance between the origin and destination of towing. The fact that we had geo-cordinates, we wanted to make sure that we take into consideration the spherical shape of the Earth while calculating the distance. In order to do that we used the Haversine Formula[Hav], which requires some series of manipulation on coordinates to get the result. This series of manipulation was done using pyspark. Once that was complete, we combined this cleaned and processed towing data with the weather data.
-As mentioned before, k-means clustering was implemented from scratch using dask. Our expectation was that if we choose the number of cluster exactly same as the number of boroughs in montreal, our k-means should classify each parking spot to it's own borough. 
-<br>
+We wanted to leverage the methods learned in class to speed up our data cleaning and preprocessing. The first task was to load data into a pyspark dataframe. From there on we went to perform all kinds of operations and benefit from the speedup of parallel processing. The most tricky part was to find the distance between the origin and destination of towing. In order to find that we used the Haversine Formula [Hav], which requires some series of manipulation on coordinates to get the result. This series of manipulation was done using pyspark. Once that was complete, we combined this cleaned and processed towing data with the weather data.
+As mentioned before, the k-means clustering was implemented from scratch using dask. <br>
+
 <b>Algorithms</b><br>
-Supervised Learning in the aforementioned paragraphs was acheieved using LinearRegression package available in the ML-Lib from Pyspark. By this time, we already had our data cleaned and ready to be fed to the model, but the input for this library was different from the regular scikit-learn libraries. Using another package from pyspark we merged all the feature columns into one vector for each row and converted the output/target_variable into a single valued vector. Using this format we were able to train the model.
+Supervised Learning in the aforementioned paragraphs was achieved using LinearRegression package available in the ML-Lib from Pyspark. We processed the data in a format that was consumable by the model and trained it as can be seen in the images below. <br>
+For k-means, the first step was to initialize the value of k that we got from our list of boroughs, next we randomly initialized centroids for each parking spot. Then we started the learning process, where for each iteration we would assign centroids to parking spots, calculate how many spots had their centroid changed (this is the stopping condition), depending on this number we would assign these newly calculated centroid to the already existing centroid in the dataframe and repeat the whole process until the number of spots that had their centroids changed was reduced to zero.<br>
+
 | ![Features](reports/figures/Features.png) 
 |:--:|
-*Fig 1:Towings in the year 2015* |<br>
+*Fig 1:Trainig data for the model* |<br>
 
 | ![Inp_out](reports/figures/Input_Output.png)
 | :--: |
 *Fig 2: Data that was fed to the model* |
 
-Using dask we read the processed parking spots file that contained details related to all the parking spots. First step was to initilize the value of k that we got from our list of boroughs, next we randomly initialized entroids for each parking spot. Then we started the learning process, where for each iteration we would assign centroids to parking spots, calculate how many spots had their centroid changed (this is the stopping condition), depending on this number we would assign these newly calculated centroid to the already existing centroid in the dataframe and repeat the whole process until the number of spots that had their centroids chagned was reduced to zero.<br>
-
-<b>RESULTS(300 words)</b><br>
+<b>RESULTS</b><br>
 <b>Description of Dataset analysis</b><br>
 The analysis of the towing data showed us that there was a drastic increase in the number of towing after the from 2015 onwards as can be seen in the following figures - 
 | ![2015](reports/figures/2015_towings.png)
@@ -81,49 +79,34 @@ These are the results we obtained after applying our self-implemented dask k-mea
 *Fig 10: Classification of spots after using k-means dask implementation* |<br>
 
 <b>Description of Implementation</b><br>
-With regards to the implementation, we used the cookkie-cutter data science template.
-To reporoduce the results of our project, we have organized the process into a series of steps that the user can follow closely and obtain the results.
+With regards to the implementation, we used the cookkie-cutter-data science template. All the raw data used in this project is located in the ```/data/raw/``` directory. Following were the steps that were taken during the project development.
+- LinearRegression
+    - We started with the preprocessing of the towing data using the scripts located in the ```/src/data/``` directory. The first step is to load the data and change the format of datetime column to make sure the join with weather data is consistent. Output is located in ```/data/interim/towing.data```.
+    - Next, we read through each of the weather file, change the column names, and then save them into parquet format in ```/data/interim/weather_year.data``` for quicker reading while training the data.
+    - Then comes the feature engineering task where we combine the data from the towing with the weather data by joining on the datetime column and performing some basic cleansing activities like converting string datatype to int. This is saved in the ```/data/processed/cleaned.data``` directory.
+    - Since we are using the PySpark ML-Lib library for training, there was an additional step of converting the input and output to vectors using the VectorAssembler from pyspark. Then the data was ready for training and we got the RMSE of 0.32 on training from the trained model. The scrits are located in the ```src/models/train_model.py```
+    
+    |![LinReg](reports/figures/Model.png)
+    | :--: |
+    <i>Fig 12: Weights and intercept of the Linear Regression Model|
 
-<b>Prerequisties</b><br>
-Make sure you have anaconda installed on your system. Open anaconda prompt and run the following commands -
+- K-means Clusterin
+    - Here we take care of the parking spots data. This part is done with Pandas, to facilitate the development process. We take the geojson file that contains Multiploygon objects for all the boroughs of Montreal and associate the geo coordinate of the parking spots with the borough name. A new column names 'Cities' is added to the dataset and in ```/data/interim/spots_with_cities.csv```.
+    - No more processing is needed for the k-means. We load the csv file using a dask dataframe and initialize our centroids randomly. Then we start clustering by getting the difference between the current coordinate values and the assigned centroid. We check the number of spots that were re-assigned at each step and repeat this process until we have 0 changes. 
+    - Lastly, we plot a graph with the results of the clustered algorithm and log the results from the classification_report module from the scikit learn library. The scrits are located in the ```src/models/predict_model.py```
 
-- To setup the environment<br>
-```$ conda create -n bigdata python=3.6```
+    |![K-means](reports/figures/K-means_result.png)
+    | :--: |
+    <i>Fig 13: Classification report for the k-means clustering|
 
-- Activate your environment<br>
-```$ conda activate bigdata```
-
-- Naviagte to the project directory and run the command to installed the necessary libraries<br>
-```$ pip install -r requirements.txt```
-<br>
-
-<b>Methodology</b><br>
-- Preprocesing scripts are located in the src/data directory. Navigate to the ```/src/data/``` folder and run the following command. Once it is complete, you have files in the ```/data/interim/``` directory.<br>
-```$ python make_dataset.py``` <br>
-
-- After the preprocessing, to build feature you can run the following command from the ```/src/features/``` directory. Once the execution finishes, you can find the cleaned data file which is used for training the model, in ```/data/processed/``` directory.<br>
-```$ python build_features.py``` <br>
-
-- Next, to train the linear regression model the following commad from ```/src/models/``` directory. This will also save the trained model in the ```/models/\<today's-date>/``` directory. Attached image shows the weights that were learned by the model for the features mentioned in the technological section.<br>
-```$ python train_model.py```<br>
-
-|![Model](reports/figures/Model.png)
-| :--: |
-<i>Fig 11: Weights and intercept of the Linear Regression Model|
-
-- Finally to use the k-means algorithm to classify the parking spots data, navigate to the ```/src/models/``` directory and run the following commands.<br>
-```$ python predict_model.py```<br>
-
-The termial logs will display the learning of the operations being performed at each steps like the preprocessing or learning of k-means. You can run the visualization scripts again to generate all the plots.<br>
-
-<b>DISCUSSION(300 words)</b><br>
+<b>DISCUSSION</b><br>
 <b>Discussion of solution</b><br>
-We obtained a RMSE of 0.32 for our LinearRegression model. The results are astounding but we believe that that model did not have enough sound data to learn anything. We were not really sure how the model learned the weights of the model, since it assigns a highest value to the latitude and no weightage to the total_snow feature.<br>
-The official website of City of Montreal states that there are 19 boroughs in Montreal, but we used only 12 becuase out of the 19 boroughs, only 12 of them had parking spots in them that are regulated by the City of Montreal. Since we provided the k=X', we realized that we embeded the prior already in our data before training the k-means, as a result of which it was able to classify them correctly as can be seen in the <i>Fig9</i> and  <i>Fig10</i> above.<br>
+We obtained a RMSE of 0.32 for our linear regression model. The results are astounding, but we believe that that model did not have enough sound data to learn anything. We were not really sure how the model learned the weights of the model, since it assigns a higher value to the latitude and no weightage to the total_snow feature.<br>
+The official website of City of Montreal states that there are 19 boroughs in Montreal, but we used only 12 because out of the 19 boroughs, only 12 of them had parking spots in them that are regulated by the City of Montreal. Since we provided the k=X', we realized that we embeded the prior already in our data before training the k-means, as a result of which it was able to classify them correctly as can be seen in the <i>Fig9</i> and  <i>Fig10</i> above.<br>
 <b>Discussion of limitations</b><br>
-After obtaining the results we realized that one of the limitation was our data. Not in terms of the amount of data but in terms of the features available in the data which expalains why we had amazing results. Since there was nothing much to learn from the data, there was nothing much to get out of it.<br>
+After obtaining the results we realized that one of the limitation was our data. Not in terms of the amount of data but in terms of the features available in the data, which explains why we had amazing results. Since there was nothing much to learn from the data, there was nothing much to get out of it.<br>
 <b>Discussion of possible future work</b><br>
-Further exploration of different datasets revelead that data related to the payments made to the parking meter is not revelaed by the Government. A request already exist and the message that shows up on the interface says that it is in progress. Supposed we had the data from the parking meters, we would be able to identify when and for how long was a parking spot occupied and vacant. Using this as our prior knowledge we would be able to calculate the probability of towing from a parking spots and classify them as based on this probability. Having this data would also enable us to construct the user-item profile that we would need for a recommender system. This system would then be able to recommend a parking spot to a user given the input parameters. <br>
+Further exploration of different datasets revealed that data related to the payments made to the parking meter is not revealed by the Government. A request already exists and the message that shows up on the interface says that it is in progress. Supposed we had the data from the parking meters, we would be able to identify when and for how long was a parking spot occupied and vacant. Using this as our prior knowledge we would be able to calculate the probability of towing from a parking spots and classify them as based on this probability. Having this data would also enable us to construct the user-item profile that we would need for a recommender system. This system would then be able to recommend a parking spot to a user given the input parameters. <br>
 <br>
 
 ___
