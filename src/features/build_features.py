@@ -119,5 +119,3 @@ if __name__ == '__main__':
 
     cleaned_data = clean_and_combined_data(joined_list)
     make_dataset.save_data(cleaned_data, os.path.join(DATA_PROCESSED_DIR, 'cleaned.data'))
-
-    

@@ -2,13 +2,6 @@ import os
 import sys
 import logging
 from datetime import datetime
-from pyspark.rdd import RDD
-from pyspark.sql import DataFrame
-from pyspark.sql import SparkSession
-from pyspark.sql import functions as F
-from pyspark.ml.feature import CountVectorizer, OneHotEncoder, VectorAssembler
-from pyspark.ml.regression import LinearRegression
-import os
 import numpy as np
 from dask import persist
 import dask.dataframe as df
@@ -17,7 +10,7 @@ from dask.distributed import Client
 import matplotlib.pyplot as plt
 from functools import reduce
 import geopandas as gpd
-from sklearn.metrics
+from sklearn.metrics import classification_report
 
 from dask.distributed import Client
 
@@ -55,7 +48,7 @@ def assignCentroid(row, centroids):
 
 def k_means(park_spot_data):
     init_centroids = park_spot_data.sample(frac=0.002).head(NUM_OF_BOROUGH ,npartitions=-1)
-    centroids = init_centroids.reset_index(drop=True).rename(columns={'sNoPlace':'name'})
+    centroids = init_centroids.reset_index(drop=True).rename(columns={'Cities':'name'})
     park_spot_data['centroids']=''
     epoch=0
     while True:
@@ -63,10 +56,10 @@ def k_means(park_spot_data):
         park_spot_data['new_centroids'] = park_spot_data.apply(assignCentroid, axis=1, args=(centroids,), meta=('centroid', 'f8'))
         park_spot_data = park_spot_data.persist()
         spot_changed_number =len(park_spot_data[park_spot_data['centroids']!=park_spot_data['new_centroids']])
-        logging.info('Epoch {0}: {1} spots re-assigned'.format(epoch,spot_changed_number))
+        print('Epoch ',epoch,':',spot_changed_number)
         if spot_changed_number==0:
-            return park_spot_data.compute()
-        centroids = park_spot_data[['nPositionCentreLongitude','nPositionCentreLatitude','new_centroids']].groupby('new_centroids').mean().reset_index().rename(columns={'new_centroids':'name'})
+            return park_spot_data
+        centroids = park_spot_data[['nPositionCentreLongitude','nPositionCentreLatitude', 'Cities', 'new_centroids']].groupby('new_centroids').mean().reset_index().rename(columns={'new_centroids':'name'})
         centroids = centroids.persist()
         park_spot_data['centroids']=park_spot_data['new_centroids']
     
@@ -82,5 +75,4 @@ if __name__ == '__main__':
     visualize.plot_parking_spots(clustered_data_geo, boroughs, 'Clustered parking spots after running k-means', 'Parking_spots_dask.png')
     y_true = clustered_data_geo['Cities']
     y_pred = clustered_data_geo['new_centroids']
-    cm = confusion_matrix(y_true, y_pred, labels=spots_cities)
-    logging.info(classification_report(y_true, y_pred, target_names=spots_cities, zero_division=0))
+    logging.info(classification_report(y_true, y_pred, target_names=clustered_data_geo['Cities'].unique(), zero_division=0))
